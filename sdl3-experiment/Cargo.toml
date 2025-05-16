@@ -1,0 +1,9 @@
+[package]
+name = "sdl3-experiment"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+sdl3-sys = { version = "*", default-features = false, features = ["build-from-source"] }
+glad-sys = {path = "../glad-sys"}

@@ -1,0 +1,12 @@
+[package]
+name = "glad-sys"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+bindgen = "0.71.1"
+cc = "1.2.22"
+quote = "1.0.40"
+regex = "1.11.1"
+syn = {version = "2.0.101", features = ["full"]}
