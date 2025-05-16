@@ -22,8 +22,9 @@ Rust gamedev is not quite mature, and some of the choices made here may turn out
 - Go to [`glad.dav1d.de`](https://glad.dav1d.de/) and generate your own bindings with your favorite extensions, alongwith its loader.
 - Replace my bindings in `glad-sys/cc/` directory with yours.
     + Apologies for the dirtiness! A much better way would be to generate bindings directly from the Khronos spec but [`gl_generator`](https://crates.io/crates/gl_generator) not getting updates is this template's *raison d'être*!
-- [`sdl3-sys`](https://crates.io/crates/sdl3-sys) is still in churn; specify an exact version number in `sdl3-experiment/Cargo.toml` instead of a wildcard if doing a more serious projects.
-    + Repository lacks a `Cargo.lock` for a similar reason.
+- If in the far future, consider bumping some of the version numbers.
+    + [`sdl3-sys`](https://crates.io/crates/sdl3-sys) is still in churn; specify an exact version number in `sdl3-experiment/Cargo.toml` instead of a wildcard if doing a more serious projects.
+    + Repository lacks a `Cargo.lock` for a similar reasons. Commit yours into your repo!
 - Compile `glad-sys`, and modify `build.rs` for your use-case and/or fix errors. DIY!
     + There are some guardrails to avoid surprises, but not nearly enough!
 
