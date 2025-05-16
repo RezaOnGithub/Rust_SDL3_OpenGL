@@ -1,6 +1,6 @@
 # Rust+SDL3+OpenGL DIY Template
 
-This is an `extern "C"`-heavy and `unsafe` template for getting started with OpenGL in Rust, using SDL3. The hope is that you will find value, and base your next project on it- unless the very design of it discourges you away.
+This is an `extern "C"`-heavy and `unsafe` template for getting started with OpenGL in Rust, using SDL3. The hope is that you will find value, and base your next project on it- unless the very design of it discourages you away.
 
 # What is the problem?
 
@@ -28,7 +28,7 @@ Rust gamedev is not quite mature, and some of the choices made here may turn out
     + There are some guardrails to avoid surprises, but not nearly enough!
 
 > [!NOTE]
-> One interesting Rust quirk is that the equivalent C function pointer type is always wrapped in `Option`. This is unlike pointers to any other raw type. There is some helper code to unwrap everything before use. `struct GL` is a part of it and it contains unwrapped function pointer.
+> One interesting Rust quirk is that the equivalent C function pointer type is always wrapped in `Option`. This is unlike pointers to any other raw type. There is some helper code to unwrap everything before use. `struct GL` is a part of it and it contains unwrapped function pointers.
 > 
 > Unfortunately, this hits another quirk of Rust where `a.B()` only ever means calling method B `impl` ed on `a` and not invoking a function pointer. This leads to code that looks like:
 >
