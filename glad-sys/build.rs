@@ -109,7 +109,6 @@ fn extract_type_from_option(ty: &syn::Type) -> Option<&syn::Type> {
 }
 
 fn main() {
-
     let cc_path = format!("{}/cc", env::var("CARGO_MANIFEST_DIR").unwrap());
     // Append `:` and add to the include_path if needed
     let include_path = format!("{}/include", cc_path.as_str());
@@ -184,6 +183,7 @@ fn main() {
                         eprintln!("UNIMPLEMENTED {}", type_name);
                         todo!("Unimplemented type! Was GLAD updated?");
                     }
+                    continue;
                 }
                 // TODO
                 // Some OpenGL types are structs. Such as:
@@ -194,52 +194,56 @@ fn main() {
                 }
                 _ => todo!("Unimplemented item! GLAD Update?"),
             }
-            if let Item::ForeignMod(s) = item {
-                // This depends on a quirk of bindgen where all generated extern blocks only contain one item
-                // This can totally break in the future!
-                assert!(
+
+            // TODO simplify control flow
+            let Item::ForeignMod(s) = item else {
+                unreachable!()
+            };
+
+            // This depends on a quirk of bindgen where all generated extern blocks only contain one item
+            // This can totally break in the future!
+            assert!(
                     s.items.len() == 1,
                     "Expected lone function pointer static inside foreign block! This may be due to bindgen behavior having changed."
                 );
-                let item = s.items.last().unwrap();
-                match item {
-                    ForeignItem::Fn(foreign_item_fn) => {
-                        // Only one actual function should be present (the loader)
-                        // OpenGL stuff are always global static function pointers
-                        // No need for special handling, bindgen already dealt with it
-                        assert!(
-                            foreign_item_fn.sig.ident.to_string().as_str() == "gladLoadGLLoader",
-                            "Unexpected C Function!"
-                        )
-                    }
-                    ForeignItem::Static(pfn) => {
-                        let symbol_name = pfn.ident.to_string();
-                        let symbol_name = symbol_name.as_str();
-                        // Assert it is a glad function pointer
-                        let namecheck = Regex::new("^glad_gl.*").unwrap();
-                        assert!(namecheck.is_match(symbol_name), "Unexpected Static!");
-                        // get rid of the prefix
-                        let symbol_name = &symbol_name[("glad_gl".len())..];
-                        let symbol_type = extract_type_from_option(
-                            &type_aliases[pfn.ty.to_token_stream().to_string().as_str()],
-                        )
-                        .unwrap();
-
-                        gl_struct.push_str(
-                            format!("pub {}: {},\n", symbol_name, symbol_type.to_token_stream())
-                                .as_str(),
-                        );
-                        gl_unwrap.push_str(
-                            format!(
-                                "{}: {}.unwrap(),\n",
-                                symbol_name,
-                                pfn.ident.to_token_stream()
-                            )
-                            .as_str(),
-                        );
-                    }
-                    _ => todo!("Unexpected item inside foreign block!"),
+            let item = s.items.last().unwrap();
+            match item {
+                ForeignItem::Fn(foreign_item_fn) => {
+                    // Only one actual function should be present (the loader)
+                    // OpenGL stuff are always global static function pointers
+                    // No need for special handling, bindgen already dealt with it
+                    assert!(
+                        foreign_item_fn.sig.ident.to_string().as_str() == "gladLoadGLLoader",
+                        "Unexpected C Function!"
+                    )
                 }
+                ForeignItem::Static(pfn) => {
+                    let symbol_name = pfn.ident.to_string();
+                    let symbol_name = symbol_name.as_str();
+                    // Assert it is a glad function pointer
+                    let namecheck = Regex::new("^glad_gl.*").unwrap();
+                    assert!(namecheck.is_match(symbol_name), "Unexpected Static!");
+                    // get rid of the prefix
+                    let symbol_name = &symbol_name[("glad_gl".len())..];
+                    let symbol_type = extract_type_from_option(
+                        &type_aliases[pfn.ty.to_token_stream().to_string().as_str()],
+                    )
+                    .unwrap();
+
+                    gl_struct.push_str(
+                        format!("pub {}: {},\n", symbol_name, symbol_type.to_token_stream())
+                            .as_str(),
+                    );
+                    gl_unwrap.push_str(
+                        format!(
+                            "{}: {}.unwrap(),\n",
+                            symbol_name,
+                            pfn.ident.to_token_stream()
+                        )
+                        .as_str(),
+                    );
+                }
+                _ => todo!("Unexpected item inside foreign block!"),
             }
         }
         gl_unwrap.push_str("};}}}\n");

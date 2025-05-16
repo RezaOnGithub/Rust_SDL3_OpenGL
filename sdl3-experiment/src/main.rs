@@ -83,7 +83,7 @@ fn main() {
         }
         SDL_GL_SetSwapInterval(1);
 
-        // TODO before using an extension, verify that it is avaliable!
+        // TODO before using an extension, verify that it is available!
         gladLoadGLLoader(transmute(SDL_GL_GetProcAddress as *mut c_void));
 
         // WE HAVE OPENGL NOW
